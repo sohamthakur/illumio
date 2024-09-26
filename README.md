@@ -22,12 +22,26 @@ This program processes flow logs by mapping each entry to a tag using a lookup t
 - **Output File**: Named with the current timestamp for uniqueness (e.g., `flow_log_summary_20240926_164151.txt`).
 
 ## Project Structure
-
-/data ├── logs.txt # Flow log file to be processed └── lookup.csv # Lookup table containing dstport, protocol, and tag
-
-/src/main/java/com/illumio ├── FlowLogTagger.java # Main entry point ├── parser/ │ ├── FlowLogParser.java # Parses flow logs │ └── LookupTableParser.java # Parses lookup table ├── processor/ │ └── TagProcessor.java # Processes flow logs and assigns tags └── util/ ├── ProtocolMapper.java # Maps protocol numbers to names └── OutputWriter.java # Writes results to output file
-
-/output └── flow_log_summary_YYYYMMDD_HHmmss.txt # Output file
+- **data/**
+  - `logs.txt` &mdash; Flow log file to be processed.
+  - `lookup.csv` &mdash; Lookup table containing `dstport`, `protocol`, and `tag`.
+  
+- **src/main/java/com/illumio/**
+  - `FlowLogTagger.java` &mdash; Main entry point for the program.
+  
+  - **parser/**
+    - `FlowLogParser.java` &mdash; Parses flow logs.
+    - `LookupTableParser.java` &mdash; Parses the lookup table.
+  
+  - **processor/**
+    - `TagProcessor.java` &mdash; Processes flow logs and assigns tags.
+  
+  - **util/**
+    - `ProtocolMapper.java` &mdash; Maps protocol numbers to names.
+    - `OutputWriter.java` &mdash; Writes results to the output file.
+  
+- **output/**
+  - `flow_log_summary_YYYYMMDD_HHmmss.txt` &mdash; Generated output file.
 
 
 ## Instructions to Compile and Run
@@ -35,6 +49,12 @@ This program processes flow logs by mapping each entry to a tag using a lookup t
 ### Prerequisites
 - **Java Development Kit (JDK) 8+**
 - **Apache Maven**
+
+### Clone the Repository
+First, clone the repository to your local machine using Git:
+
+```bash
+git clone https://github.com/yourusername/illumio.git
 
 ### Compile the Program
 1. Navigate to the project root directory (where `pom.xml` is located).
