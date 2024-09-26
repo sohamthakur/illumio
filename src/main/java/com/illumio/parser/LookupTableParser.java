@@ -9,6 +9,7 @@ import java.util.Map;
 /**
  * LookupTableParser
  *
+ * Author: Soham Thakur
  * Parses the lookup table CSV file mapping (dstport, protocol) to tags.
  */
 public class LookupTableParser {

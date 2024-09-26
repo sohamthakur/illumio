@@ -6,48 +6,32 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * OutputWriter
- *
- * Utility class to write output CSV files.
+ * Author: Soham Thakur
+ * OutputWriter is responsible for writing tag and port/protocol counts to an output file.
  */
 public class OutputWriter {
 
     /**
-     * Writes tag counts to a CSV file.
+     * Writes the tag counts and port/protocol counts to the output file.
      *
-     * @param tagCounts Map of tag to count.
-     * @param filePath  Output file path.
-     * @throws IOException If writing fails.
+     * @param outputFilename the name of the output file
+     * @param tagCountMap the tag count data
+     * @param portProtocolCountMap the port/protocol count data
+     * @throws IOException if an error occurs during file writing
      */
-    public static void writeTagCounts(Map<String, Integer> tagCounts, String filePath) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            writer.write("Tag,Count");
-            writer.newLine();
-            for (Map.Entry<String, Integer> entry : tagCounts.entrySet()) {
-                writer.write(entry.getKey() + "," + entry.getValue());
-                writer.newLine();
+    public void writeOutput(String outputFilename, Map<String, Integer> tagCountMap, Map<String, Integer> portProtocolCountMap) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilename))) {
+            // Write Tag Counts
+            writer.write("Tag Counts:\n");
+            for (Map.Entry<String, Integer> entry : tagCountMap.entrySet()) {
+                writer.write(entry.getKey() + ", " + entry.getValue() + "\n");
             }
-        }
-    }
 
-    /**
-     * Writes port/protocol counts to a CSV file.
-     *
-     * @param portProtocolCounts Map of "port,protocol" to count.
-     * @param filePath           Output file path.
-     * @throws IOException If writing fails.
-     */
-    public static void writePortProtocolCounts(Map<String, Integer> portProtocolCounts, String filePath) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            writer.write("Port,Protocol,Count");
-            writer.newLine();
-            for (Map.Entry<String, Integer> entry : portProtocolCounts.entrySet()) {
-                String[] keyParts = entry.getKey().split(",", 2);
-                if (keyParts.length != 2) continue;
-                writer.write(keyParts[0] + "," + keyParts[1] + "," + entry.getValue());
-                writer.newLine();
+            // Write Protocol/Port counts
+            writer.write("\nPort/Protocol Combination Counts:\n");
+            for (Map.Entry<String, Integer> entry : portProtocolCountMap.entrySet()) {
+                writer.write(entry.getKey() + ", " + entry.getValue() + "\n");
             }
         }
     }
 }
-

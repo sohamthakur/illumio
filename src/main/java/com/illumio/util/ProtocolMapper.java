@@ -6,6 +6,7 @@ import java.util.Map;
 /**
  * ProtocolMapper
  *
+ * Author: Soham Thakur
  * Utility class to map protocol numbers to protocol names.
  */
 public class ProtocolMapper {
@@ -29,4 +30,3 @@ public class ProtocolMapper {
         return protocolDictionary.getOrDefault(protocolNumber, "unknown");
     }
 }
-

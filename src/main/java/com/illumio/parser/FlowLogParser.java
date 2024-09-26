@@ -1,7 +1,5 @@
 package com.illumio.parser;
 
-import com.illumio.model.FlowLogEntry;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,39 +7,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * FlowLogParser
- *
- * Parses AWS VPC Flow Log files.
+ * Author: Soham Thakur
+ * FlowLogParser is responsible for parsing the flow log file.
  */
 public class FlowLogParser {
 
     /**
-     * Parses the flow log file and returns a list of FlowLogEntry objects.
+     * Parses the flow log file and returns a list of raw log entries.
+     * Each entry is a String array containing the fields from a flow log line.
      *
-     * @param filePath Path to the flow log file.
-     * @return List of FlowLogEntry.
-     * @throws IOException If file reading fails.
+     * @param flowLogPath the path to the flow log file
+     * @return List of String[] containing parsed log entries
+     * @throws IOException if there is an error reading the log file
      */
-    public List<FlowLogEntry> parseFlowLog(String filePath) throws IOException {
-        List<FlowLogEntry> entries = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+    public List<String[]> parseFlowLog(String flowLogPath) throws IOException {
+        List<String[]> entries = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(flowLogPath))) {
             String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty()) continue; // Skip empty lines
-                String[] tokens = line.split("\\s+");
-                if (tokens.length < 14) {
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.trim().split("\\s+");
+                if (parts.length >= 13) {
+                    entries.add(parts);
+                } else {
                     System.err.println("Skipping malformed line: " + line);
-                    continue;
-                }
-
-                try {
-                    int destinationPort = Integer.parseInt(tokens[5]);
-                    int protocolNumber = Integer.parseInt(tokens[6]);
-
-                    FlowLogEntry entry = new FlowLogEntry(destinationPort, protocolNumber);
-                    entries.add(entry);
-                } catch (NumberFormatException e) {
-                    System.err.println("Invalid number format in line: " + line);
                 }
             }
         }

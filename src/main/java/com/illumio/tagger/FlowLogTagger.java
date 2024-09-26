@@ -1,20 +1,22 @@
 package com.illumio.tagger;
 
 import com.illumio.parser.FlowLogParser;
-import com.illumio.parser.LookupTableParser;
-import com.illumio.model.FlowLogEntry;
+import com.illumio.processor.TagProcessor;
 import com.illumio.util.OutputWriter;
-import com.illumio.util.ProtocolMapper;
+import com.illumio.parser.LookupTableParser;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
 /**
- * FlowLogTagger
- *
- * Main class to execute the flow log tagging process.
+ * Author: Soham Thakur
+ * FlowLogTagger is the main class responsible for managing the flow log tagging process.
  */
 public class FlowLogTagger {
 
@@ -27,9 +29,9 @@ public class FlowLogTagger {
         String flowLogPath = args[0];
         String lookupTablePath = args[1];
 
-        // Parse lookup table
+        // Parse the lookup table
         LookupTableParser lookupParser = new LookupTableParser();
-        Map<String, String> lookupMap = null;
+        Map<String, String> lookupMap;
         try {
             lookupMap = lookupParser.parseLookupTable(lookupTablePath);
         } catch (IOException e) {
@@ -37,41 +39,44 @@ public class FlowLogTagger {
             return;
         }
 
-        // Initialize counters
-        Map<String, Integer> tagCountMap = new HashMap<>();
-        Map<String, Integer> portProtocolCountMap = new HashMap<>();
-
-        // Parse flow logs
-        FlowLogParser flowParser = new FlowLogParser();
+        // Parse the flow logs
+        FlowLogParser flowLogParser = new FlowLogParser();
+        List<String[]> logEntries;
         try {
-            List<FlowLogEntry> entries = flowParser.parseFlowLog(flowLogPath);
-            for (FlowLogEntry entry : entries) {
-                String protocolName = ProtocolMapper.getProtocolName(entry.getProtocolNumber()).toLowerCase();
-                String portProtocolKey = entry.getDestinationPort() + "," + protocolName;
-
-                // Update port/protocol counts
-                portProtocolCountMap.put(portProtocolKey, portProtocolCountMap.getOrDefault(portProtocolKey, 0) + 1);
-
-                // Assign tag
-                String tag = lookupMap.getOrDefault(portProtocolKey, "Untagged");
-
-                // Update tag counts
-                tagCountMap.put(tag, tagCountMap.getOrDefault(tag, 0) + 1);
-            }
+            logEntries = flowLogParser.parseFlowLog(flowLogPath);
         } catch (IOException e) {
             System.err.println("Error reading flow log: " + e.getMessage());
             return;
         }
 
-        // Write outputs
-        try {
-            OutputWriter.writeTagCounts(tagCountMap, "../../output/tag_counts.csv");
-            OutputWriter.writePortProtocolCounts(portProtocolCountMap, "../../output/port_protocol_counts.csv");
-        } catch (IOException e) {
-            System.err.println("Error writing output files: " + e.getMessage());
+        // Processing the logs to get tag and port/protocol counts
+        TagProcessor tagProcessor = new TagProcessor(lookupMap);
+        Map<String, Map<String, Integer>> resultMap = tagProcessor.processLogs(logEntries);
+
+        // Defining output file path with dynamic timestamp
+        Path outputDir = Paths.get("output");
+        if (!Files.exists(outputDir)) {
+            try {
+                Files.createDirectories(outputDir);
+            } catch (IOException e) {
+                System.err.println("Failed to create output directory: " + e.getMessage());
+                return;
+            }
         }
 
-        System.out.println("Tagging completed. Output files are located in the 'output' directory.");
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+        String timestamp = now.format(formatter);
+        String outputFilename = outputDir.resolve("flow_log_summary_" + timestamp + ".txt").toString();
+
+        // Write the output to the file
+        OutputWriter outputWriter = new OutputWriter();
+        try {
+            outputWriter.writeOutput(outputFilename, resultMap.get("tagCountMap"), resultMap.get("portProtocolCountMap"));
+        } catch (IOException e) {
+            System.err.println("Error writing output file: " + e.getMessage());
+        }
+
+        System.out.println("Tagging completed. Output file is located at: " + outputFilename);
     }
 }
-
