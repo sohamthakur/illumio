@@ -1,4 +1,4 @@
-# Flow Log Tagging Program
+# Illumio - Flow Log Tagging Assessment
 
 ## Overview
 This program processes flow logs by mapping each entry to a tag using a lookup table. It outputs two key metrics:
@@ -54,7 +54,7 @@ This program processes flow logs by mapping each entry to a tag using a lookup t
 ### Clone the Repository
 First, clone the repository to your local machine using Git:
 
-git clone https://github.com/sohamthakur/illumio.git
+**git clone https://github.com/sohamthakur/illumio.git**
 
 ### Compile the Program
 1. Navigate to the project root directory (where `pom.xml` is located).
