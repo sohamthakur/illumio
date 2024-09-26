@@ -1,0 +1,18 @@
+Tag Counts:
+Untagged, 16
+
+Port/Protocol Combination Counts:
+143,unknown, 1
+56000,unknown, 1
+1024,unknown, 1
+80,unknown, 1
+49153,unknown, 1
+443,unknown, 3
+1030,unknown, 1
+23,unknown, 1
+49154,unknown, 1
+110,unknown, 1
+49321,unknown, 1
+993,unknown, 1
+49152,unknown, 1
+25,unknown, 1
