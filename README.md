@@ -25,10 +25,11 @@ This program processes flow logs by mapping each entry to a tag using a lookup t
 
 ## Project Structure
 
-/data # Contains the input files (logs.txt, lookup.csv)
+### /data Contains the input files (logs.txt, lookup.csv)
 
-logs.txt # Flow log file to be processed.
-lookup.csv # Lookup table containing dstport, protocol, and tag.
+### logs.txt Flow log file to be processed.
+### lookup.csv # Lookup table containing dstport, protocol, and tag.
+
 src/main/java/com/illumio
 
 FlowLogTagger.java ## Main entry point for the program.
@@ -55,30 +56,25 @@ output/ # Output directory containing results.
    ```bash
    mvn clean compile
 
-### Run the Program
+# Run the Program
 Ensure that the input files (logs.txt and lookup.csv) are placed inside the data/ directory.
 
-## Run the program using the following command:
-
-mvn exec:java -Dexec.args="data/logs.txt data/lookup.csv"
+## mvn exec:java -Dexec.args="data/logs.txt data/lookup.csv"
 
 The output file will be saved in the output/ directory with a name like flow_log_summary_YYYYMMDD_HHmmss.txt
 
 ## Testing
 Test Cases
-# Basic Matching: Tested with sample flow logs and lookup table to ensure correct matching and tagging.
-# Unknown Protocol Handling: Flow logs with protocol numbers not found in the ProtocolMapper are mapped as "unknown".
-# Malformed Entries: Lines with fewer than 13 fields or incorrect formats are skipped with appropriate warnings.
-# Large File Handling: Successfully tested with flow log files up to 10MB and lookup tables with 10,000 mappings.
+**Basic Matching: Tested with sample flow logs and lookup table to ensure correct matching and tagging.**
+**Unknown Protocol Handling: Flow logs with protocol numbers not found in the ProtocolMapper are mapped as "unknown".**
+**Malformed Entries: Lines with fewer than 13 fields or incorrect formats are skipped with appropriate warnings.**
+**Large File Handling: Successfully tested with flow log files up to 10MB and lookup tables with 10,000 mappings.**
 
 ## How to Test
 Ensure that the flow log file and lookup table exist in the data/ directory.
 Run the program as described in the Run the Program section and verify the output in the output/ directory.
-Future Improvements
-Extend the protocol mapping in ProtocolMapper to include more protocols.
-Add support for alternative output formats such as CSV or JSON.
-Consider optimizing the program for multi-threaded processing of large flow log files.
-Notes
-If no matches are found in the lookup table for a given (dstport, protocol) combination, the entry will be tagged as "Untagged".
-Protocol mapping is currently limited to common protocols (TCP, UDP, ICMP). Any unrecognized protocol will be marked as "unknown".
+
+## Notes
+**If no matches are found in the lookup table for a given (dstport, protocol) combination, the entry will be tagged as "Untagged".**
+**Protocol mapping is currently limited to common protocols (TCP, UDP, ICMP). Any unrecognized protocol will be marked as "unknown".**
 
