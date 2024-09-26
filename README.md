@@ -1,110 +1,84 @@
 # illumio
-Overview
-This project implements a Java program that parses a flow log file and maps each entry to a tag based on a lookup table. The lookup table contains mappings of destination ports and protocols to tags. The program generates an output file that contains:
 
-Tag Counts: Count of matches for each tag.
-Port/Protocol Combination Counts: Count of matches for each unique port/protocol combination.
-Assumptions Made
-Flow Log Format: The flow log is in AWS VPC Flow Log format, with at least 13 columns, where:
+# Flow Log Tagging Program
 
-Column 6 represents the destination port.
-Column 7 represents the protocol number.
-Version 2 Log Format: The program only supports version 2 of the AWS flow log format. It assumes all lines in the flow log follow this version format. Any malformed lines or lines with fewer than 13 fields will be skipped and not processed.
+## Overview
+This program processes flow logs by mapping each entry to a tag using a lookup table. It outputs two key metrics:
+- **Tag Counts**: The total number of occurrences for each tag.
+- **Port/Protocol Combination Counts**: The total number of occurrences for each port/protocol combination.
 
-Lookup Table Format: The lookup table is a CSV file with the following columns:
+## Assumptions
+- **Log Format**: The program supports AWS VPC Flow Logs in **version 2** format, which is assumed to have 13 columns:
+  - Column 6 represents the **destination port**.
+  - Column 7 represents the **protocol number**.
+- **Lookup Table Format**: The lookup table is provided as a CSV file with the following columns:
+  - `dstport`: Destination port.
+  - `protocol`: Protocol (e.g., `tcp`, `udp`, `icmp`). This field is case-insensitive.
+  - `tag`: A string representing the tag to apply for the port/protocol combination.
+- **Protocol Mapping**: A predefined mapping exists for commonly used protocols:
+  - `1 -> icmp`
+  - `6 -> tcp`
+  - `17 -> udp`
+  - Any unknown protocol numbers are mapped to `"unknown"`.
+- **Untagged Entries**: Any entries that do not match a `(dstport, protocol)` combination in the lookup table will be assigned the tag `"Untagged"`.
+- **Output File**: The output file is generated with the current date and time in the filename, ensuring uniqueness.
 
-dstport (integer, representing destination port)
-protocol (string, representing the protocol in lowercase, e.g., tcp, udp, icmp)
-tag (string, representing the tag)
-Protocol Mapping: The program assumes a predefined mapping of protocol numbers to names:
+## Project Structure
 
-1 -> icmp
-6 -> tcp
-17 -> udp
-Any protocol numbers not in this predefined list will be mapped to "unknown".
-Case Sensitivity: All protocol names in the lookup table are handled in a case-insensitive manner.
+/data # Contains the input files (logs.txt, lookup.csv)
 
-Untagged Entries: If no tag is found for a particular port/protocol combination, the entry will be tagged as "Untagged".
+logs.txt # Flow log file to be processed.
+lookup.csv # Lookup table containing dstport, protocol, and tag.
+src/main/java/com/illumio
 
-Output File Naming: The output file is created with the current date and time appended to its filename to ensure uniqueness.
+FlowLogTagger.java ## Main entry point for the program.
+parser/
+FlowLogParser.java # Responsible for parsing flow logs.
+LookupTableParser.java # Responsible for parsing the lookup table.
+processor/
+TagProcessor.java # Processes the flow logs and assigns tags.
+util/
+ProtocolMapper.java # Maps protocol numbers to protocol names.
+OutputWriter.java # Writes the result to an output file.
+output/ # Output directory containing results.
 
-Instructions to Compile and Run the Program
-Prerequisites
-Java Development Kit (JDK): Ensure you have JDK 8 or later installed.
-Apache Maven: Used for project build and dependency management.
-Compile the Program
-Clone or download the project from the repository.
-Navigate to the root directory of the project where the pom.xml file is located.
-Run the following command to compile the project:
-bash
-Copy code
-mvn clean compile
-Run the Program
-Ensure the flow log file and lookup table are in the appropriate directories (e.g., data/logs.txt and data/lookup.csv).
 
-Use the following command to run the program with mvn:
+## Instructions to Compile and Run
 
-bash
-Copy code
+### Prerequisites
+- **JDK 8+**
+- **Apache Maven**
+
+### Compile the Program
+1. Navigate to the root directory of the project (where `pom.xml` is located).
+2. Run the following Maven command to compile the project:
+   ```bash
+   mvn clean compile
+
+### Run the Program
+Ensure that the input files (logs.txt and lookup.csv) are placed inside the data/ directory.
+
+## Run the program using the following command:
+
 mvn exec:java -Dexec.args="data/logs.txt data/lookup.csv"
-Replace the file paths with the actual paths to your flow log and lookup table if necessary.
 
-The output file will be generated in the output directory, with a name like flow_log_summary_YYYYMMDD_HHmmss.txt.
+The output file will be saved in the output/ directory with a name like flow_log_summary_YYYYMMDD_HHmmss.txt
 
-Sample Output Format
-plaintext
-Copy code
-Tag Counts:
-sv_P2, 1
-sv_P1, 2
-sv_P4, 1
-email, 3
-Untagged, 9
+## Testing
+Test Cases
+# Basic Matching: Tested with sample flow logs and lookup table to ensure correct matching and tagging.
+# Unknown Protocol Handling: Flow logs with protocol numbers not found in the ProtocolMapper are mapped as "unknown".
+# Malformed Entries: Lines with fewer than 13 fields or incorrect formats are skipped with appropriate warnings.
+# Large File Handling: Successfully tested with flow log files up to 10MB and lookup tables with 10,000 mappings.
 
-Port/Protocol Combination Counts:
-443,tcp, 1
-23,tcp, 1
-110,tcp, 1
-143,tcp, 1
-993,tcp, 1
-1024,tcp, 1
-80,tcp, 1
-25,tcp, 1
-Testing
-Test Cases Executed:
-Basic Flow Log and Lookup Table Matching:
-
-Tested with sample flow log and lookup table as provided in the problem statement to ensure correct tagging and counting.
-Unknown Protocol Handling:
-
-Entries in the flow log with unknown protocol numbers (not present in the ProtocolMapper) are tagged as "unknown".
-Malformed Flow Log Entries:
-
-Tested with malformed lines in the flow log file (e.g., fewer than 13 fields). The program correctly skips such lines and processes valid ones.
-Empty Lookup Table:
-
-Tested with an empty lookup table. The program correctly tags all entries as "Untagged".
-Large File Handling:
-
-Tested the program with a 10MB flow log file and a lookup table containing 10,000 mappings. The program performed as expected.
-How to Test
-Run the Program: Follow the instructions to run the program with different test cases.
-Verify Output: Check the generated output file to ensure the results are as expected.
-Edge Cases Handled
-Malformed flow log entries are skipped with a warning.
-Missing or unknown protocol numbers are handled and displayed as "unknown".
-No tag is assigned when no matching port/protocol combination is found, and the entry is marked "Untagged".
-Analysis of the Code
-Modular Design:
-
-The program follows a modular design pattern, with each class responsible for a specific functionality (e.g., parsing, processing, output writing). This allows for easy maintenance and extensibility.
-Scalability:
-
-The program efficiently handles large flow log files and lookup tables. It uses buffered readers and writers to manage file I/O, ensuring scalability for large datasets.
-Error Handling:
-
-The program is designed to skip over malformed entries in the flow log or lookup table while still processing valid entries. This ensures robustness even in the presence of data inconsistencies.
-Logging:
-
-Basic logging has been implemented to notify users of skipped malformed lines in the flow log and lookup table.
+## How to Test
+Ensure that the flow log file and lookup table exist in the data/ directory.
+Run the program as described in the Run the Program section and verify the output in the output/ directory.
+Future Improvements
+Extend the protocol mapping in ProtocolMapper to include more protocols.
+Add support for alternative output formats such as CSV or JSON.
+Consider optimizing the program for multi-threaded processing of large flow log files.
+Notes
+If no matches are found in the lookup table for a given (dstport, protocol) combination, the entry will be tagged as "Untagged".
+Protocol mapping is currently limited to common protocols (TCP, UDP, ICMP). Any unrecognized protocol will be marked as "unknown".
 
