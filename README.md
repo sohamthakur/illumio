@@ -27,7 +27,8 @@ This program processes flow logs by mapping each entry to a tag using a lookup t
   - `lookup.csv` &mdash; Lookup table containing `dstport`, `protocol`, and `tag`.
   
 - **src/main/java/com/illumio/**
-  - `FlowLogTagger.java` &mdash; Main entry point for the program.
+  -  **tagger/**
+    - `FlowLogTagger.java` &mdash; Main entry point for the program.
   
   - **parser/**
     - `FlowLogParser.java` &mdash; Parses flow logs.
@@ -53,8 +54,7 @@ This program processes flow logs by mapping each entry to a tag using a lookup t
 ### Clone the Repository
 First, clone the repository to your local machine using Git:
 
-```bash
-git clone https://github.com/yourusername/illumio.git
+git clone https://github.com/sohamthakur/illumio.git
 
 ### Compile the Program
 1. Navigate to the project root directory (where `pom.xml` is located).
