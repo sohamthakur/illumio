@@ -26,7 +26,7 @@ public class FlowLogParser {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.trim().split("\\s+");
-                if (parts.length >= 13) {
+                if (parts.length > 13) {
                     entries.add(parts);
                 } else {
                     System.err.println("Skipping malformed line: " + line);

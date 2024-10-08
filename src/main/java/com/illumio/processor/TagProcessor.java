@@ -29,8 +29,8 @@ public class TagProcessor {
         Map<String, Integer> portProtocolCountMap = new HashMap<>();
 
         for (String[] entry : logEntries) {
-            int destinationPort = Integer.parseInt(entry[5]);
-            String protocolName = ProtocolMapper.getProtocolName(Integer.parseInt(entry[6])).toLowerCase();
+            int destinationPort = Integer.parseInt(entry[6]);
+            String protocolName = ProtocolMapper.getProtocolName(Integer.parseInt(entry[7])).toLowerCase();
             String portProtocolKey = destinationPort + "," + protocolName;
 
             // Update port/protocol counts
