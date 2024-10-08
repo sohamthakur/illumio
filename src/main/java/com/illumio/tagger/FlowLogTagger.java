@@ -29,16 +29,6 @@ public class FlowLogTagger {
         String flowLogPath = args[0];
         String lookupTablePath = args[1];
 
-        // Parse the lookup table
-        LookupTableParser lookupParser = new LookupTableParser();
-        Map<String, String> lookupMap;
-        try {
-            lookupMap = lookupParser.parseLookupTable(lookupTablePath);
-        } catch (IOException e) {
-            System.err.println("Error reading lookup table: " + e.getMessage());
-            return;
-        }
-
         // Parse the flow logs
         FlowLogParser flowLogParser = new FlowLogParser();
         List<String[]> logEntries;
@@ -46,6 +36,16 @@ public class FlowLogTagger {
             logEntries = flowLogParser.parseFlowLog(flowLogPath);
         } catch (IOException e) {
             System.err.println("Error reading flow log: " + e.getMessage());
+            return;
+        }
+
+        // Parse the lookup table
+        LookupTableParser lookupParser = new LookupTableParser();
+        Map<String, String> lookupMap;
+        try {
+            lookupMap = lookupParser.parseLookupTable(lookupTablePath);
+        } catch (IOException e) {
+            System.err.println("Error reading lookup table: " + e.getMessage());
             return;
         }
 
